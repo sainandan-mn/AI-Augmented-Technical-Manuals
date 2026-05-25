@@ -1,19 +1,15 @@
 import os
 import re
-import shutil
 import textwrap
 import time
 from pathlib import Path
 
-import chromadb
 import streamlit as st
 from google import genai
 
 
 APP_TITLE = "AI-Augmented Technical Manuals"
 DOC_DIR = Path(__file__).parent / "manuals"
-DB_DIR = Path(__file__).parent / ".chroma_airbus_brakes"
-COLLECTION_NAME = "airbus_brake_manuals_poc"
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 EMBEDDING_MODEL = os.getenv("GEMINI_EMBEDDING_MODEL", "gemini-embedding-001")
 CHUNK_SIZE = 1400
@@ -186,55 +182,54 @@ def embed_texts(client, texts: list[str]) -> list[list[float]]:
     return all_vectors
 
 
-def get_collection():
-    chroma_client = chromadb.PersistentClient(path=str(DB_DIR))
-    return chroma_client.get_or_create_collection(name=COLLECTION_NAME, metadata={"hnsw:space": "cosine"})
+def cosine_similarity(left: list[float], right: list[float]) -> float:
+    numerator = sum(a * b for a, b in zip(left, right))
+    left_norm = sum(a * a for a in left) ** 0.5
+    right_norm = sum(b * b for b in right) ** 0.5
+    if not left_norm or not right_norm:
+        return 0.0
+    return numerator / (left_norm * right_norm)
+
+
+def keyword_boost(question: str, text: str, metadata: dict) -> float:
+    haystack = f"{text} {metadata.get('source', '')} {metadata.get('DMC', '')}".lower()
+    tokens = set(re.findall(r"[a-z0-9][a-z0-9-]{2,}", question.lower()))
+    if not tokens:
+        return 0.0
+    hits = sum(1 for token in tokens if token in haystack)
+    return min(hits / max(len(tokens), 1), 1.0) * 0.12
 
 
 def reset_index():
-    if DB_DIR.exists():
-        shutil.rmtree(DB_DIR)
+    st.session_state.pop("knowledge_index", None)
 
 
 def build_index(api_key: str) -> int:
     client = make_client(api_key)
     chunks = build_chunks()
     vectors = embed_texts(client, [c["text"] for c in chunks])
-    collection = get_collection()
-    if collection.count() > 0:
-        collection.delete(ids=collection.get()["ids"])
-    collection.add(
-        ids=[c["metadata"]["chunk_id"] for c in chunks],
-        documents=[c["text"] for c in chunks],
-        embeddings=vectors,
-        metadatas=[c["metadata"] for c in chunks],
-    )
+    st.session_state["knowledge_index"] = [
+        {"text": chunk["text"], "metadata": chunk["metadata"], "embedding": vector}
+        for chunk, vector in zip(chunks, vectors)
+    ]
     return len(chunks)
 
 
 def collection_ready() -> bool:
-    if not DB_DIR.exists():
-        return False
-    try:
-        return get_collection().count() > 0
-    except Exception:
-        return False
+    return bool(st.session_state.get("knowledge_index"))
 
 
 def retrieve(api_key: str, question: str, families: list[str], top_k: int = TOP_K) -> list[dict]:
     client = make_client(api_key)
     query_vector = embed_texts(client, [question])[0]
-    where = {"source": {"$in": families}} if families and len(families) < 4 else None
-    result = get_collection().query(
-        query_embeddings=[query_vector],
-        n_results=top_k,
-        where=where,
-        include=["documents", "metadatas", "distances"],
-    )
     rows = []
-    for doc, meta, distance in zip(result["documents"][0], result["metadatas"][0], result["distances"][0]):
-        rows.append({"text": doc, "metadata": meta, "distance": distance})
-    return rows
+    for item in st.session_state.get("knowledge_index", []):
+        if families and item["metadata"].get("source") not in families:
+            continue
+        semantic_score = cosine_similarity(query_vector, item["embedding"])
+        score = semantic_score + keyword_boost(question, item["text"], item["metadata"])
+        rows.append({"text": item["text"], "metadata": item["metadata"], "score": score})
+    return sorted(rows, key=lambda row: row["score"], reverse=True)[:top_k]
 
 
 def build_context(retrieved: list[dict]) -> str:
@@ -349,7 +344,7 @@ The visible experience abstracts away the underlying source count and presents t
 
 Recommended production upgrades:
 - Replace local markdown files with an approved technical-publication connector.
-- Persist Chroma to controlled storage and version indexes by manual revision.
+- Persist embeddings to controlled storage and version indexes by manual revision.
 - Add authentication, audit logs, and feedback capture.
 - Keep human-in-the-loop approval for any maintenance release decision.
         """
