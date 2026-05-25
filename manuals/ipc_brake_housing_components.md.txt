@@ -1,0 +1,117 @@
+# ILLUSTRATED PARTS CATALOG (IPC)
+## ATA Chapter 32-42-01: Main Brake Housing Assembly Components
+
+---
+
+### DOCUMENT IDENTIFICATION
+
+| Metadata Key              | Value                                          |
+|---------------------------|------------------------------------------------|
+| **DMC**                   | DMC-A320-A-32-42-01-00A-520A-A                 |
+| **Document Type**         | IPC — Illustrated Parts Catalog                |
+| **ATA Chapter**           | 32-42-01 — Main Brake Housing Assembly         |
+| **Master Assembly FIN**   | 10MG — Main Brake Actuator Assembly Group      |
+| **EFF (Document)**        | ALL (row-level effectivity governs per item)   |
+| **Zone**                  | 710 — Left Main Landing Gear Compartment       |
+| **Authoring Std**         | S1000D Issue 4.2 / ATA iSpec 2200              |
+| **Issue Date**            | 2024-11-15                                     |
+| **Revision**              | C                                              |
+| **Security Class**        | UNCLASSIFIED — Operator and Vendor Distribution|
+
+---
+
+### REFERENCES
+
+| Reference Key                         | Document Title                                              |
+|---------------------------------------|-------------------------------------------------------------|
+| `AMM Task 32-42-05-300-002`           | Main Brake Actuator Module — Removal and Installation       |
+| `AMM Task 32-42-05-400-001`           | Brake Actuator Transducer — Bench Test Procedure            |
+| `WDM DMC-A320-A-32-42-11-00A-520A-A` | Braking System — Wiring Diagram, Lines A/B Transducer Circuit|
+| `TSM DMC-A320-A-32-42-00-00A-520A-A` | Braking System — Fault Isolation Manual                     |
+| `IPC Figure 32-42-01`                 | Main Brake Housing Assembly — Exploded View Illustration    |
+| `SB A320-32-1042`                     | Service Bulletin — Actuator Base Mod Transition MSN 001–200 to 201–500 |
+| `MIL-DTL-38999L`                      | Connector, Electrical, Circular, Miniature, Specification   |
+
+---
+
+### USAGE NOTES
+
+> ℹ️ **NOTE:** Each row in the parts matrix below contains a self-contained
+> Effectivity (EFF) string. This architecture ensures that LLM text-chunk
+> retrieval operations on individual rows return unambiguous part-to-airframe
+> compatibility data without dependency on document-level metadata context.
+> Always verify row-level EFF against the aircraft MSN before raising a
+> purchase order or work order.
+
+> ℹ️ **NOTE:** Items 1 and 1A are mutually exclusive effectivity variants of
+> the same installation position. Do not install P/N BA-900-3242A on MSN 201
+> and above. Do not install P/N BA-900-3242B on MSN 001–200 without prior
+> incorporation of Service Bulletin `SB A320-32-1042`.
+
+---
+
+### PARTS MATRIX — FIN: 10MG — MAIN BRAKE HOUSING ASSEMBLY
+
+| Item Number | Part Number     | Nomenclature / Description                                                                   | Qty per Assy | Effectivity (EFF) / Tail Application                                                      |
+|-------------|-----------------|----------------------------------------------------------------------------------------------|:------------:|-------------------------------------------------------------------------------------------|
+| 1           | BA-900-3242A    | Main Brake Actuator Assembly — Base Production Modification, Standard-Cycle Configuration, Aluminum Housing, Nitrile Primary Seals, Operating Pressure 3,000 PSI (206 bar) | 1 | **EFF: MSN 001–200** — Applicable to all aircraft from first delivery through MSN 200. Superseded by BA-900-3242B on MSN 201 and above per SB A320-32-1042. Not interchangeable with Item 1A without SB embodiment. |
+| 1A          | BA-900-3242B    | Main Brake Actuator Assembly — Upgraded High-Cycle Modification, Extended-Life Ceramic-Coated Bore, PTFE Primary Seals, Operating Pressure 3,000 PSI (206 bar), Fatigue Life +40% vs. BA-900-3242A | 1 | **EFF: MSN 201–500** — Applicable to all aircraft from MSN 201 through MSN 500 inclusive. Retrofit to MSN 001–200 is permissible only after compliance with SB A320-32-1042. Item 1 and Item 1A are position-exclusive; only one installed per aircraft. |
+| 2           | PT-402-AERO     | Hydraulic Pressure Transducer — Piezo-resistive Full Wheatstone Bridge, Range 0–3,000 PSI (0–206 bar), Output 1.0 VDC–5.0 VDC Analog Linear, Excitation +28 VDC, MIL-PRF-39001 Class S rated, M18 × 1.5 port thread, Connector per MIL-DTL-38999 Series III 4-pin | 1 | **EFF: ALL** — Applicable to all MSN without restriction. COTS component; no service bulletin dependency. Interchangeable across FIN 10MG installations on MSN 001–500. |
+| 3           | OR-3242-K       | O-Ring Replacement Overhaul Kit — Nitrile (NBR 70 Shore A), Skydrol LD-4 and Hyjet IV-A compatible, kit contains: (2) MS29513-016 Primary Union O-Rings, (2) MS29513-012 Return Union O-Rings, (1) MS29513-906 End-Cap Seal, (4) MS29513-008 Port Plug O-Rings; all items individually bagged and lot-traced; shelf life 10 years from cure date per AS1933 | 1 | **EFF: ALL** — Applicable to all MSN without restriction. Mandatory replacement at every actuator removal/installation event per AMM Task 32-42-05-300-002. Do not reuse removed O-rings regardless of apparent condition. |
+| 4           | B-0375-16A      | Structural Retention Bolt — Hex Head, Material: Alloy Steel ASTM A574, Surface Treatment: Zinc-Nickel Plate per ASTM B841, Grade 12.9, Size: 3/8 in × 2 in (M10 × 50 mm metric equivalent), Thread: 3/8-16 UNC-2A, Head Drive: Hex 9/16 in (14.3 mm) AF, Tensile Strength: 180,000 PSI (1,241 MPa) minimum, Installation Torque: 45 ft-lbs (61 N·m) per AMM Task 32-42-05-300-002 cross-torque sequence, Locking Wire required: MS20995C32 | 3 | **EFF: ALL** — Applicable to all MSN without restriction. Life-limited: maximum 5,000 installation cycles per IPC Figure 32-42-01. Inspect for thread damage and corrosion at each removal. Replace as a complete set of 3; do not mix lot numbers within one installation position. |
+| 5           | CN-LG32-P       | Plug Connector Sub-Assembly — Environmentally Sealed, Circular, 4-Pin, MIL-DTL-38999 Series III, Shell Size 11, Insert Arrangement 4-4, Key Position A, Bayonet Coupling, Shell Material Aluminum Alloy 6061-T6 Cadmium Plated Olive Drab, Contacts Gold-Plated Crimp Size 20 per MIL-C-39029/4, Environmental Harshness Zone 5 rated (-55°C to +200°C, IP67), 90° angled backshell ABS-BKSHL-38999-11-90D included, mates with socket CN-LG32 per WDM DMC-A320-A-32-42-11-00A-520A-A | 1 | **EFF: ALL** — Applicable to all MSN without restriction. Replace as complete sub-assembly; do not replace individual contacts only unless contact damage is isolated and wire harness W-32-MG100-SERIES is verified undamaged. Inspect at each actuator removal per AMM Task 32-42-05-300-002 Step 7.2. |
+| 6           | BS-885-M32      | Machined Brake Stator Housing Module — Aluminum Alloy 7075-T73, Hard Anodize Finish MIL-A-8625 Type III Class 2, Bore Diameter 88.5 mm ± 0.01 mm (3.484 in ± 0.0004 in), Port Thread P1: M18 × 1.5 (Primary Pressure), Port Thread P2: M14 × 1.5 (Return), Dowel Pin Bore: 12.00 mm +0.00/−0.05 mm, Mounting Flange: 4 × M12 threaded inserts, Stator Slot Count: 5, Heat Treatment per AMS 2770, Dimensional Inspection Report required at installation | 1 | **EFF: MSN 001–200** — Applicable to all aircraft from MSN 001 through MSN 200 inclusive. Superseded on MSN 201 and above by BS-886-M32 (not within scope of this IPC revision). Bore wear limit: 12.15 mm maximum on dowel bores per SRM Chapter 32-42. Return unserviceable units to overhaul with full dimensional report. |
+
+---
+
+### PROCUREMENT METADATA BLOCK
+
+#### Classification and Source Coding
+
+| Item Number | Part Number  | Procurement Class | Source Category                  | CAGE Code | Vendor Name                        | Lead Time (Typical) | MOQ |
+|-------------|--------------|-------------------|----------------------------------|-----------|-------------------------------------|---------------------|-----|
+| 1           | BA-900-3242A | Class 1 — Proprietary | Airbus Direct Supply Only   | V77291    | Airbus Propulsion Systems           | 90–120 calendar days | 1   |
+| 1A          | BA-900-3242B | Class 1 — Proprietary | Airbus Direct Supply Only   | V77291    | Airbus Propulsion Systems           | 90–120 calendar days | 1   |
+| 2           | PT-402-AERO  | COTS              | Regional Warehouse Stock         | N/A       | Multi-source — Approved Vendor List | 5–10 business days  | 1   |
+| 3           | OR-3242-K    | COTS              | Regional Warehouse Stock         | N/A       | Multi-source — Approved Vendor List | 3–7 business days   | 1   |
+| 4           | B-0375-16A   | COTS              | Regional Warehouse Stock         | N/A       | Multi-source — Approved Vendor List | 3–7 business days   | 6   |
+| 5           | CN-LG32-P    | COTS              | Regional Warehouse Stock         | N/A       | Multi-source — Approved Vendor List | 5–10 business days  | 1   |
+| 6           | BS-885-M32   | Class 1 — Proprietary | Airbus Direct Supply Only   | V77291    | Airbus Propulsion Systems           | 120–180 calendar days | 1  |
+
+---
+
+#### Procurement Class Definitions
+
+| Class                      | Definition                                                                                                   |
+|----------------------------|--------------------------------------------------------------------------------------------------------------|
+| **Class 1 — Proprietary**  | Part manufactured exclusively by or under direct license from Airbus Propulsion Systems (CAGE: V77291). Procurement through any channel other than the Airbus Spares Network (ASN) or an authorized Airbus Spare Parts Center (SPC) is prohibited. No approved alternate source exists. Requests must be raised via Airbus Material Order System (AMOS) with full MSN and FIN declaration. |
+| **COTS**                   | Commercial-Off-The-Shelf part procurable from any supplier on the Airbus Approved Vendor List (AVL) for ATA Chapter 32. Regional Warehouse Stock items are pre-positioned at operator line stations. Purchase Orders must reference the Airbus P/N exactly as listed in this IPC. Substitution of equivalent commercial P/Ns without Airbus Engineering Authorization (AEA) is prohibited. |
+
+---
+
+#### Stockroom and Handling Requirements
+
+| Item Number | Part Number  | Storage Class      | ESD Sensitivity | Shelf Life       | Handling Requirement                                              |
+|-------------|--------------|--------------------|-----------------|------------------|-------------------------------------------------------------------|
+| 1           | BA-900-3242A | Controlled — Bonded Store | Non-ESD    | Unlimited (inspect seals at 5-year intervals) | Store horizontally in original packaging. Protect port threads with plastic caps. Inspect O-ring pre-seals before installation. |
+| 1A          | BA-900-3242B | Controlled — Bonded Store | Non-ESD    | Unlimited (inspect seals at 5-year intervals) | Store horizontally in original packaging. Protect port threads with plastic caps. Inspect O-ring pre-seals before installation. |
+| 2           | PT-402-AERO  | Standard Avionics Store | ESD Sensitive — Class 1A | Unlimited (bench-test after 24 months) | Handle with ESD wrist strap. Store in antistatic bag. Do not expose connector pins to uncontrolled environment. |
+| 3           | OR-3242-K    | Elastomer Store — Temperature Controlled (+15°C to +25°C) | Non-ESD | 10 years from cure date (lot-trace label) | Do not store near ozone sources, UV light, or solvents. Verify cure date before issue. Return to stores if cure date is within 6 months of expiry. |
+| 4           | B-0375-16A   | Standard Hardware Store | Non-ESD    | Unlimited (inspect coating at issue) | Inspect zinc-nickel plate for corrosion before issue. Issue as matched lot set of 3. Do not issue individual bolts from mixed lots. |
+| 5           | CN-LG32-P    | Avionics Store      | Non-ESD (metallic shell) — ESD Sensitive (internal contact surfaces) | Unlimited | Inspect contact gold plating and keyway before issue. Store in sealed original packaging. |
+| 6           | BS-885-M32   | Controlled — Bonded Store | Non-ESD    | Unlimited (dimensional re-inspection after 10 years in storage) | Store with bore plugged and ports capped. Keep dimensional inspection certification with unit. Do not issue without current dimensional report on file. |
+
+---
+
+### REVISION RECORD
+
+| Rev | Date       | Reason for Change                                                          | Author          |
+|-----|------------|----------------------------------------------------------------------------|-----------------|
+| A   | 2022-06-01 | Initial issue — Items 1, 2, 3, 4, 5 baselined                             | Config. Mgmt.   |
+| B   | 2023-03-14 | Item 1A added per SB A320-32-1042; Item 6 added; CAGE code verified        | Config. Mgmt.   |
+| C   | 2024-11-15 | Stockroom handling table added; O-ring shelf life updated to 10 years; Item 4 MOQ corrected to 6 | Config. Mgmt.   |
+
+---
+
+*End of Data Module — DMC-A320-A-32-42-01-00A-520A-A*
+*IPC ATA Chapter 32-42-01 — Main Brake Housing Assembly Components — Revision C — 2024-11-15*

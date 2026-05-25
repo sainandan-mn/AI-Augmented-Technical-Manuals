@@ -1,0 +1,113 @@
+# AIRCRAFT MAINTENANCE MANUAL (AMM)
+## Task 32-42-05-300-002: Removal and Installation — Main Brake Actuator Module
+
+---
+
+### DOCUMENT IDENTIFICATION
+
+| Metadata Key       | Value                                    |
+|--------------------|------------------------------------------|
+| **DMC**            | DMC-A320-A-32-42-05-00A-520A-A           |
+| **Task Number**    | 32-42-05-300-002                         |
+| **FIN**            | 10MG-A — Main Brake Actuator Module      |
+| **EFF**            | MSN 001–200                              |
+| **Zone**           | 710 — Left Main Landing Gear Compartment |
+| **Access Panel**   | 711AR                                    |
+| **ATA Chapter**    | 32-42 — Normal Braking — Actuators       |
+| **Task Class**     | On-Aircraft Maintenance                  |
+| **Task Type**      | Removal / Installation                   |
+| **Authoring Std**  | S1000D Issue 4.2                         |
+| **Issue Date**     | 2024-11-15                               |
+| **Revision**       | C                                        |
+
+---
+
+### 1. REFERENCES
+
+| Reference Key                         | Title                                                        |
+|---------------------------------------|--------------------------------------------------------------|
+| `AMM Task 29-10-00-910-001`           | Hydraulic System — Blue System Depressurization              |
+| `AMM Task 29-10-00-300-001`           | Hydraulic System — Blue System Pressurization & Leak Check   |
+| `AMM Task 32-42-05-400-001`           | Brake Actuator Transducer — Bench Test Procedure             |
+| `AMM Task 20-93-00-400-001`           | Bonding and Earthing — Connector Backshell Procedure         |
+| `WDM DMC-A320-A-32-42-11-00A-520A-A` | Braking System — Wiring Diagram, Lines A/B Transducer Circuit|
+| `IPC Figure 32-42-05, Item 040`       | Main Brake Actuator Module — Part Number Reference           |
+| `AMM Task 12-32-00-680-001`           | Hydraulic Fluid Handling and Contamination Control           |
+
+---
+
+### 2. SAFETY REQUIREMENTS
+
+> ⚠️ **WARNING:** The Blue Hydraulic System operates at a nominal pressure of
+> 3,000 PSI (206 bar). Residual trapped pressure in local brake lines may reach
+> 1,500 PSI (103 bar) even after system-level depressurization. Contact with
+> pressurized hydraulic fluid at this level constitutes a HIGH-PRESSURE INJECTION
+> HAZARD capable of penetrating skin and causing severe tissue necrosis, systemic
+> toxicity, or death. Do not loosen any hydraulic union, coupling, or bleed fitting
+> until system depressurization is confirmed at local test point TP-32A (pressure
+> ≤ 50 PSI / 3.4 bar as indicated on GSE-HYD-4200 gauge). Always direct drain
+> flow away from personnel. Wear face shield (EN166 rated), chemical-resistant
+> gloves (EN374 rated), and hydraulic-fluid-resistant coveralls before
+> disconnecting any fluid-carrying line.
+
+> 🛑 **CAUTION:** The Main Brake Actuator Module (FIN: 10MG-A) contains internal
+> LVDT position transducers and pressure-sensing microcircuitry sensitive to
+> Electrostatic Discharge (ESD). Discharge to components at or above 100V may
+> cause latent or immediate failure of transducer signal processing circuits
+> without visible external damage. Before handling the actuator assembly or
+> its electrical connectors, don a wrist strap bonded to airframe earth
+> (resistance verified < 1 MΩ per AMM Std. 20-93-00). Store removed unit
+> immediately in approved ESD-protective packaging (pink polyethylene
+> antistatic bag minimum; conductive hard-shell case preferred for transit).
+> Do not place unit on unprotected metal surfaces or synthetic-material
+> workbenches.
+
+> ℹ️ **NOTE:** This task requires a minimum crew of two (2) certified
+> maintenance personnel. One technician executes the procedure; a second
+> acts as safety observer and torque-witness. Both personnel must hold
+> ATA Chapter 32 task authorization on type. Estimated task duration:
+> 4.5 hours including bleed and leak-check. Schedule hydraulic system
+> availability accordingly.
+
+---
+
+### 3. PERSONNEL AND CERTIFICATION
+
+| Requirement          | Specification                              |
+|----------------------|--------------------------------------------|
+| Crew Minimum         | 2 persons                                  |
+| Authorization        | ATA 32 On-Aircraft Task Authorization      |
+| Medical Fitness      | Current — no impairment to fine motor task |
+| PPE Minimum Standard | Face shield EN166, Gloves EN374, Coveralls |
+
+---
+
+### 4. EXPENDABLE MATERIALS
+
+| Item | Description                          | Specification / P/N          | Qty     |
+|------|--------------------------------------|------------------------------|---------|
+| E01  | Hydraulic Fluid                      | Skydrol LD-4 or Hyjet IV-A   | 1.5 L   |
+| E02  | Blank Cap Set (hydraulic ports)      | ABS-CAP-32 (assorted)        | 1 set   |
+| E03  | O-Ring — Union Coupling (Primary)    | MS29513-016 (Viton)          | 2 each  |
+| E04  | O-Ring — Union Coupling (Return)     | MS29513-012 (Viton)          | 2 each  |
+| E05  | Locking Wire — Structural Bolts      | 0.032 in (0.8 mm) MS20995C32 | 300 mm  |
+| E06  | Lint-Free Wipe                       | AMM Std. Consumable C-020    | 10 each |
+| E07  | Antiseize Compound                   | Never-Seez NSBT-8 or equiv.  | As req. |
+| E08  | Bonding Lead — Temporary Earthing    | GSE-BOND-001                 | 1 each  |
+| E09  | Drain Tray (min. 2 L capacity)       | GSE-TRAY-002 or equiv.       | 1 each  |
+| E10  | ESD Protective Packaging             | Antistatic bag, min. 4 mil   | 1 each  |
+
+---
+
+### 5. TOOLING REQUIREMENTS
+
+| Tool ID | Description                                      | Part Number / Standard      |
+|---------|--------------------------------------------------|-----------------------------|
+| T01     | Flange Torque Spanner                            | ABS-9023                    |
+| T02     | Hydraulic Line Bleed Kit                         | Airbus-LK-32                |
+| T03     | Hydraulic Pressure Test Set (0–5,000 PSI)        | GSE-HYD-4200 or equiv.      |
+| T04     | Digital Torque Wrench (10–100 ft-lbs / 14–135 N·m) | Norbar Pro 100 or equiv.  |
+| T05     | Digital Torque Wrench (20–200 in-lbs / 2.3–22.6 N·m) | Norbar Slipper or equiv. |
+| T06     | ESD Wrist Strap and Bonding Lead                 | Per AMM Std. 20-93-00       |
+| T07     | Face Shield (ballistic-rated)                    | EN166 certified             |
+| T08

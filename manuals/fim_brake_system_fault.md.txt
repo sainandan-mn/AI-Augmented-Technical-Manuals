@@ -1,0 +1,137 @@
+# FAULT ISOLATION MANUAL (FIM/TSM)
+## TROUBLESHOOTING PROCEDURE — BRAKE SYSTEM PRESSURE FAULT
+
+---
+
+### DOCUMENT IDENTIFICATION
+
+| Metadata Key          | Value                                      |
+|-----------------------|--------------------------------------------|
+| **DMC**               | DMC-A320-A-32-42-00-00A-520A-A             |
+| **FIN**               | 10MG — Main Brake Actuator Assembly        |
+| **EFF**               | MSN 001–200                                |
+| **Zone**              | 710 — Left Main Landing Gear Compartment   |
+| **Fault Code**        | CMS-FAULT-32-42-E12                        |
+| **ATA Chapter**       | 32-42 — Normal Braking — Actuators         |
+| **Issue Date**        | 2024-11-15                                 |
+| **Doc Class**         | TSM — Troubleshooting Manual               |
+| **Security Class**    | UNCLASSIFIED — Operator Distribution       |
+| **Authoring Std**     | S1000D Issue 4.2                           |
+
+---
+
+### 1. APPLICABILITY
+
+**EFF: MSN 001–200**
+**Zone: 710 (Left Main Landing Gear Compartment)**
+**FIN: 10MG**
+
+This procedure applies to aircraft with the Normal Braking System configured per
+Drawing D-32-42-000-00 Rev C and later. Do not apply to aircraft with SB 32-42-0031
+incorporated without concurrent incorporation of SB 32-42-0034.
+
+---
+
+### 2. ECAM ALERT REFERENCE
+
+| Field                    | Value                                                            |
+|--------------------------|------------------------------------------------------------------|
+| **ECAM Message**         | `BRAKE L/R SYS FAULT`                                           |
+| **Alert Class**          | Amber Caution                                                    |
+| **Fault Code**           | `CMS-FAULT-32-42-E12`                                           |
+| **CMS Trigger Condition**| Hydraulic pressure differential between Line A and Line B < 120 bar during active braking command |
+| **CMS Detection Logic**  | Pressure Transducer PT-32A vs. PT-32B mismatch exceeding ±15 bar threshold for > 2.0 sec continuous |
+| **Associated CFDS Class**| Class 1 — In-flight detectable, maintenance action required      |
+| **BITE Source**          | BSCU (Braking and Steering Control Unit) Ch. 1 / Ch. 2          |
+
+---
+
+### 3. SAFETY PRECAUTIONS
+
+> **WARNING:** Before performing any hydraulic system checks, ensure all hydraulic
+> system pressure is bled to zero. Residual pressure in Line A or Line B above
+> 50 bar constitutes a lethal injection hazard. Refer to AMM Task 29-10-00-910-001
+> (Hydraulic System Depressurization — Safety Procedure) before proceeding.
+
+> **CAUTION:** Do not actuate brakes during ground hydraulic power application
+> without installing wheel chocks. Failure to comply may result in uncommanded
+> aircraft movement.
+
+> **NOTE:** All CMS fault codes retrieved via the MCDU (CFDS menu path:
+> `MCDU → CFDS → AVNCS MENU → ATA 32 → BRAKING`) must be recorded prior to
+> any component removal. CMS data is volatile upon power interruption.
+
+---
+
+### 4. REFERENCED PUBLICATIONS
+
+| Reference Key                          | Document Title                                               |
+|----------------------------------------|--------------------------------------------------------------|
+| `AMM Task 32-42-05-300-002`            | Normal Brake Actuator — Functional Pressure Test             |
+| `WDM DMC-A320-A-32-42-11-00A-520A-A`  | Braking System — Wiring Diagram, Lines A/B Transducer Circuit|
+| `AMM Task 29-10-00-910-001`            | Hydraulic System — Depressurization Procedure                |
+| `AMM Task 32-42-00-810-001`            | Normal Braking System — BITE / CFDS Fault Retrieval          |
+| `IPC Figure 32-42-05, Item 070`        | Pressure Transducer PT-32A/B — Part Number Reference         |
+
+---
+
+### 5. TOOLS AND EQUIPMENT REQUIRED
+
+| Item | Description                            | Part Number / Standard  |
+|------|----------------------------------------|-------------------------|
+| T01  | Hydraulic Pressure Test Set            | GSE-HYD-4200 or equiv.  |
+| T02  | Digital Multimeter (CAT III, 600V)     | Per AMM Std. 70-00-00   |
+| T03  | CMS / CFDS MCDU Interface Cable        | GSE-MCDU-001            |
+| T04  | Bonding/Earthing Lead (2m min)         | Per AMM Std. 20-93-00   |
+
+---
+
+### 6. FAULT ISOLATION TREE
+
+**Fault Code: CMS-FAULT-32-42-E12**
+**Trigger:** Transducer pressure mismatch — Line A vs. Line B < 120 bar during braking command.
+
+| Step | Diagnostic Action                                                                                                                                                                                                                  | Finding / Result                                                                                   | Next Step / Resolution                                                                                                                 |
+|------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| 1    | **Retrieve CFDS Fault History.** Via MCDU CFDS menu, access ATA 32 fault log. Record all instances of `CMS-FAULT-32-42-E12`. Note flight phase at fault trigger (ground / airborne) and number of occurrences (last 10 flights). | **Finding A:** Single occurrence, airborne, no repeat. | Proceed to **Step 2** to isolate intermittent transducer fault. |
+|      |                                                                                                                                                                                                                                    | **Finding B:** Repeat occurrences (≥ 3), any phase.                                                | Proceed directly to **Step 3**. High confidence hardware fault.                                                                        |
+|      |                                                                                                                                                                                                                                    | **Finding C:** Fault logged only on ground with no hydraulic power applied.                         | Proceed to **Step 4**. Suspect BSCU internal fault or ground power anomaly.                                                            |
+| 2    | **Perform Transducer Differential Pressure Test.** Apply hydraulic ground power (Line A and Line B simultaneously) per `AMM Task 32-42-05-300-002`. Connect pressure test set T01 at test points TP-32A and TP-32B (Zone 710, Fwd bulkhead, FS 2750). Command braking via hydraulic test rig. Record PT-32A and PT-32B output pressures at 50%, 75%, and 100% brake command. | **Finding A:** Both transducers read within ±10 bar of each other across all command levels. Pressure ≥ 140 bar at 100% command. | No hardware fault confirmed. Likely CAS transient. Clear fault in CFDS. Return aircraft to service. Document findings per local QA procedure. |
+|      |                                                                                                                                                                                                                                    | **Finding B:** PT-32A or PT-32B reading deviates > ±15 bar from counterpart at any command level. Identify which transducer is out-of-tolerance. | Proceed to **Step 3** with identified suspect transducer.                                                                              |
+|      |                                                                                                                                                                                                                                    | **Finding C:** Both transducers read < 120 bar at 100% brake command.                              | Suspect upstream hydraulic restriction or low system charge. Refer to `AMM Task 29-10-00-300-001` (Hydraulic System Servicing). Do not proceed on brake system until system pressure verified serviceable. |
+| 3    | **Perform Transducer Wiring and Continuity Check.** Depressurize hydraulic system per `AMM Task 29-10-00-910-001`. Disconnect electrical connectors CN-32A and CN-32B from suspect transducer (Zone 710, reference `WDM DMC-A320-A-32-42-11-00A-520A-A`, Sheet 3). Using DMM (T02), measure: (a) Pin 1–2 supply voltage (28VDC nominal), (b) Pin 3–4 signal output resistance (expected: 1.2 kΩ–2.4 kΩ), (c) Pin 5 shield/ground continuity to airframe (< 1 Ω). | **Finding A:** Supply voltage within tolerance. Signal resistance within range. Ground continuity confirmed. | Transducer electrically serviceable. Suspect BSCU channel processing fault. Proceed to **Step 4**.                                    |
+|      |                                                                                                                                                                                                                                    | **Finding B:** Supply voltage absent or < 24 VDC.                                                  | Trace wiring upstream to BSCU output per `WDM DMC-A320-A-32-42-11-00A-520A-A`, Sheet 1. Repair open circuit or replace wiring segment per `AMM Task 20-20-00-400-001`. Retest per Step 2. |
+|      |                                                                                                                                                                                                                                    | **Finding C:** Signal resistance out of range (< 1.2 kΩ or > 2.4 kΩ), or open circuit.            | **Replace** suspect pressure transducer (PT-32A or PT-32B) per `AMM Task 32-42-05-400-001`. Reference `IPC Figure 32-42-05, Item 070` for P/N. Retest per Step 2. |
+|      |                                                                                                                                                                                                                                    | **Finding D:** Ground continuity > 1 Ω (high resistance or open).                                  | Clean and re-bond connector backshell to airframe structure per `AMM Task 20-93-00-400-001`. Retest continuity before proceeding.      |
+| 4    | **BSCU Channel Isolation.** With hydraulic system depressurized and wiring confirmed serviceable, perform BSCU Built-In Test via CFDS: `MCDU → CFDS → AVNCS MENU → ATA 32 → BSCU → GND TEST → CHAN SEL`. Run Channel 1 and Channel 2 tests independently. Record PASS/FAIL status for each channel. | **Finding A:** Both channels PASS. No BSCU internal fault detected.                                | Fault non-reproducible at component level. Clear fault code in CFDS. Carry forward in Tech Log per operator MEL/DDG. Monitor for recurrence over next 5 flights. |
+|      |                                                                                                                                                                                                                                    | **Finding B:** Channel 1 FAIL, Channel 2 PASS (or vice versa).                                    | **Replace BSCU** per `AMM Task 32-43-00-400-001`. Following replacement, perform full BSCU ground test per `AMM Task 32-43-00-710-001`. Retest brake system per Step 2. |
+|      |                                                                                                                                                                                                                                    | **Finding C:** Both channels FAIL.                                                                 | **Replace BSCU** per `AMM Task 32-43-00-400-001`. Verify aircraft-side wiring and connector integrity before installing new unit. Perform full BSCU ground test per `AMM Task 32-43-00-710-001`. If fault persists post-replacement, escalate to Airbus Tech Support (AOG Desk) with full CFDS dump. |
+
+---
+
+### 7. POST-ISOLATION ACTIONS
+
+1. Clear all active faults from CFDS following confirmation of corrective action.
+2. Perform a complete brake system operational check per `AMM Task 32-42-05-300-002`.
+3. Verify no residual ECAM messages present on both ECAM DUs prior to releasing aircraft.
+4. Complete all entries in the Aircraft Technical Log (ATL) and Maintenance Record per operator procedures.
+5. If any component was replaced (transducer or BSCU), update Component History Record (CHR) per operator CMM traceability requirements.
+
+> **NOTE:** If fault `CMS-FAULT-32-42-E12` recurs within 5 flight cycles following
+> any corrective action defined in this procedure, escalate to Tier 2 troubleshooting
+> and contact Airbus Customer Services — Technical AOG Desk. Provide full CFDS data
+> export and component history records for engineering review.
+
+---
+
+### 8. REVISION RECORD
+
+| Rev | Date       | Reason for Change                          | Author     |
+|-----|------------|--------------------------------------------|------------|
+| A   | 2023-04-10 | Initial issue                              | Tech Pubs  |
+| B   | 2024-01-22 | Step 3 wiring tolerance updated per SB 32-42-0031 | Tech Pubs  |
+| C   | 2024-11-15 | Added BSCU dual-channel isolation (Step 4) | Tech Pubs  |
+
+---
+
+*End of Data Module — DMC-A320-A-32-42-00-00A-520A-A*

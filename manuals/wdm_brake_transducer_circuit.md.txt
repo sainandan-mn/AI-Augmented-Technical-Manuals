@@ -1,0 +1,448 @@
+```markdown
+# AIRCRAFT WIRING MANUAL (AWM/WDM)
+## Wiring Architecture and Pin-Out Routing Specification
+### Brake Pressure Transducer Signal Circuit — Lines A/B Interface
+
+---
+
+### DOCUMENT IDENTIFICATION
+
+| Metadata Key         | Value                                              |
+|----------------------|----------------------------------------------------|
+| **DMC**              | DMC-A320-A-32-42-11-00A-520A-A                     |
+| **Document Type**    | AWM/WDM — Wiring Diagram and Pin-Out Specification |
+| **ATA Chapter**      | 32-42 — Normal Braking — Actuators                 |
+| **FIN (Primary)**    | 12MG — Brake Pressure Transducer                   |
+| **FIN (Secondary)**  | 10MG — Actuator System Control Unit Interface      |
+| **EFF**              | ALL                                                |
+| **Zone**             | 710 — Left Main Landing Gear Strut, Lower Forward Segment |
+| **Connector Ref**    | CN-LG32                                            |
+| **Authoring Std**    | S1000D Issue 4.2 / ASD-STE100                      |
+| **Issue Date**       | 2024-11-15                                         |
+| **Revision**         | D                                                  |
+| **Security Class**   | UNCLASSIFIED — Operator Distribution               |
+
+---
+
+### 1. REFERENCES
+
+| Reference Key                          | Document Title                                                  |
+|----------------------------------------|-----------------------------------------------------------------|
+| `AMM Task 32-42-05-300-002`            | Main Brake Actuator Module — Removal and Installation           |
+| `AMM Task 32-42-05-400-001`            | Brake Actuator Transducer — Bench Test Procedure                |
+| `TSM DMC-A320-A-32-42-00-00A-520A-A`  | Braking System — Fault Isolation Manual                         |
+| `WDM DMC-A320-A-32-42-11-01A-520A-A`  | Braking System — Wiring Diagram, BSCU Internal Bus Routing      |
+| `WDM DMC-A320-A-32-41-11-00A-520A-A`  | Braking System — Anti-Skid Control Wiring Schematic             |
+| `AWM Chapter 20-54`                    | Shielded Cable Routing and Termination Standard                 |
+| `AWM Chapter 24-50`                    | Aircraft DC Power Distribution — Circuit Breaker Panel 10VU     |
+| `IPC Figure 32-42-11, Item 010`        | Connector CN-LG32 — Part Number and Insertion Tool Reference    |
+| `MIL-DTL-38999L`                       | Connector, Electrical, Circular, Miniature, Specification       |
+| `MIL-W-22759/16`                       | Wire, Electrical, PTFE Insulated, Specification                 |
+
+---
+
+### 2. SCOPE AND PURPOSE
+
+This data module defines the complete wiring architecture, conductor routing,
+connector specification, and pin-out assignment for the analog pressure telemetry
+circuit originating at the Brake Pressure Transducer (FIN: 12MG) in Zone 710,
+routed via harness W-32-MG100-SERIES to the Brake System Control Unit Channel 1
+(BSCU-1) installed at Main Avionics Rack 8VU, and return-grounded at Ground
+Block GD-02 (Frame 24, Zone 120).
+
+This document provides the authoritative pin-to-pin wiring source for:
+- Connector maintenance, continuity verification, and pin extraction/insertion.
+- Fault isolation of signal anomalies on the 1.0 V–5.0 V analog telemetry loop.
+- EMI shielding integrity verification at bulkhead termination points.
+- Replacement of harness sub-segments identified in AWM Chapter 20-54.
+
+---
+
+### 3. SYSTEM SCHEMATIC SUMMARY
+
+#### 3.1 Signal Chain Architecture
+
+The brake pressure telemetry loop is a single-ended analog voltage signal
+operating in the range **1.0 VDC (0 bar) to 5.0 VDC (350 bar)**, generated
+by the piezo-resistive bridge of the Brake Pressure Transducer FIN 12MG
+(Zone 710, Left Main Landing Gear Strut Lower Forward Segment).
+
+The signal chain is defined as follows:
+
+```
+  ┌─────────────────────────────────────────────────────────────────────────────────┐
+  │  DC POWER ORIGIN                                                                │
+  │  Panel 10VU — Circuit Breaker CB-10MG                                          │
+  │  Rating: 1A / 28 VDC — Location: Row E, Position 14, Panel 10VU               │
+  │  (Main Avionics Rack Zone, Zone 120, Frame 20)                                 │
+  └────────────────────────────┬────────────────────────────────────────────────────┘
+                               │ +28 VDC Supply
+                               │ Wire: W-32-MG102-A22 (22 AWG, Red, PTFE)
+                               │ Routing: Zone 120 → Zone 310 → Zone 710
+                               │ Via: Bulkhead Grommet BG-32-F24 at Frame 24
+                               ▼
+  ┌─────────────────────────────────────────────────────────────────────────────────┐
+  │  CONNECTOR CN-LG32 — PIN A                                                     │
+  │  MIL-DTL-38999 Series III — 4-Pin Bayonet Socket                               │
+  │  Zone 710 — Left Main Landing Gear Strut, Lower Forward Segment                │
+  │  Environmental Harshness Zone 5 (High vibration, fluid exposure, temp: -55°C   │
+  │  to +200°C)                                                                    │
+  └────────────────────────────┬────────────────────────────────────────────────────┘
+                               │ +28 VDC Excitation to Transducer Bridge
+                               ▼
+  ┌─────────────────────────────────────────────────────────────────────────────────┐
+  │  BRAKE PRESSURE TRANSDUCER — FIN: 12MG                                         │
+  │  Location: Zone 710, Left Main Gear Strut, FS 2762, Fwd Face                   │
+  │  Type: Piezo-resistive full Wheatstone bridge                                  │
+  │  Range: 0–350 bar / 0–5,076 PSI                                                │
+  │  Output Signal: 1.0 VDC (0 bar) to 5.0 VDC (350 bar) analog linear            │
+  │  Excitation: +28 VDC ±0.5 V                                                    │
+  └────────┬───────────────────────────────────────────┬───────────────────────────┘
+           │ Analog Signal Output                      │ DC Ground Return
+           │ Wire: W-32-MG104-C24 (24 AWG, Blue)       │ Wire: W-32-MG103-B22 (22 AWG, Black)
+           │ Twisted Shielded Pair with Pin D           │
+           ▼                                           ▼
+  ┌─────────────────────────────────────────────────────────────────────────────────┐
+  │  CONNECTOR CN-LG32 — PIN C (Signal) and PIN B (Ground)                         │
+  │  Twisted Shielded Pair: W-32-MG104-C24 / W-32-MG103-B22                        │
+  │  Shield: W-32-MG105-D-SH — Outer Braid, grounded at Bulkhead Frame 24          │
+  │  Shield Drain Wire terminates at CN-LG32 Pin D                                 │
+  └────────────────────────────┬────────────────────────────────────────────────────┘
+                               │ Signal and Ground routed via harness
+                               │ W-32-MG100-SERIES
+                               │ Routing: Zone 710 → Zone 310 → Zone 120
+                               │ Via: Conduit C-32-LG-01, tied at 300 mm intervals
+                               ▼
+  ┌─────────────────────────────────────────────────────────────────────────────────┐
+  │  BRAKE SYSTEM CONTROL UNIT CHANNEL 1 — BSCU-1                                  │
+  │  FIN: 10MG — Actuator System Control Unit Interface                             │
+  │  Location: Main Avionics Rack 8VU, Shelf 3, Position 2                         │
+  │  Zone: 120 (Main Equipment Centre, Frame 18–22)                                │
+  │  Signal Input Impedance: 100 kΩ (analog voltage input channel AV-12)           │
+  │  Accepted Signal Range: 0.8 VDC – 5.2 VDC (0.8 V and 5.2 V = out-of-range    │
+  │  flags; triggers CMS-FAULT-32-42-E12 if sustained > 2.0 sec)                  │
+  └─────────────────────────────────────────────────────────────────────────────────┘
+                               │
+                               │ DC Ground Return Path
+                               ▼
+  ┌─────────────────────────────────────────────────────────────────────────────────┐
+  │  GROUND BLOCK GD-02                                                             │
+  │  Location: Frame 24, Zone 120, Fwd Bulkhead Lower Stringer                     │
+  │  Type: 12-lug tinned copper bus bar, M4 stud terminations                      │
+  │  Bonded to airframe primary structure at Frame 24 center web                   │
+  │  Ground resistance to airframe: < 2.5 mΩ (verified per AWM Ch. 20-93)         │
+  └─────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 3.2 EMI Shield Architecture
+
+The twisted shielded pair carrying Pin C (signal) and Pin B (ground) is enclosed
+in an outer braid shield (Wire Identifier: W-32-MG105-D-SH). Shield termination
+follows AWM Chapter 20-54 single-point ground discipline:
+
+- **Transducer end (Zone 710):** Shield is NOT grounded. Braid is floating,
+  terminated with insulating heat-shrink sleeve at the CN-LG32 backshell entry.
+- **Bulkhead end (Frame 24):** Shield braid drain wire terminates at CN-LG32
+  Pin D, which routes via harness to Ground Block GD-02 at Frame 24.
+- **Single-point grounding** eliminates ground loop interference on the
+  1.0 V–5.0 V low-level analog signal path.
+- **Shield coverage:** Minimum 90% optical coverage per MIL-W-22759 braid
+  specification. Verify coverage before harness installation using continuity
+  check from braid-to-Pin D: target resistance < 0.5 Ω end-to-end.
+
+---
+
+### 4. CONNECTOR SPECIFICATION — CN-LG32
+
+| Field                        | Specification                                                  |
+|------------------------------|----------------------------------------------------------------|
+| **Connector Reference**      | CN-LG32                                                        |
+| **Connector Type**           | Circular, Miniature, Bayonet Coupling, Socket (Receptacle)     |
+| **Specification**            | MIL-DTL-38999 Series III                                       |
+| **Shell Size**               | Size 11 (Nominal shell diameter: 0.811 in / 20.6 mm)          |
+| **Insert Arrangement**       | 4-Pin (Insert Arrangement Code: 4-4)                           |
+| **Coupling Mechanism**       | Bayonet — 3-start, anti-decoupling ratchet                     |
+| **Shell Material**           | Aluminum Alloy 6061-T6, Electroless Nickel over Cadmium Plate  |
+| **Shell Finish**             | Olive Drab Cadmium per MIL-DTL-38999L Table I                  |
+| **Insert Material**          | Glass-filled fluorosilicone (GFS), 200°C rated                 |
+| **Contact Type**             | Crimp socket, size 20, gold-plated per MIL-C-39029/4           |
+| **Contact Material**         | Copper alloy, gold flash over nickel underplate                |
+| **Mating Plug Reference**    | CN-LG32P (Plug, field-installable, matching P/N per IPC 32-42-11, Item 010) |
+| **Environmental Harshness**  | Zone 5 — High vibration (15g, 20–2000 Hz), fluid immersion exposure, thermal cycling -55°C to +200°C |
+| **IP Rating**                | IP67 — Dust-tight and immersion to 1 m depth per IEC 60529    |
+| **Keying**                   | Key Position A (0° reference, factory-set, non-interchangeable with adjacent connectors CN-LG30, CN-LG31, CN-LG33) |
+| **Backshell Type**           | ABS-BKSHL-38999-11-90D — 90° angled, EMI/RFI conductive, strain-relief clamp |
+| **Mounting**                 | Panel-mount, jam-nut secured, Zone 710 bracket BKT-32-LG-04 (FS 2762) |
+| **Mating Torque**            | 40 in-lbs (4.5 N·m) — bayonet coupling nut, per IPC Figure 32-42-11 |
+| **Unmating Torque**          | 15 in-lbs (1.7 N·m) minimum pull-off — anti-decoupling ratchet |
+| **Approved P/N (Socket)**    | AMP / TE Connectivity P/N: D38999/26WA-4SN                    |
+| **Approved P/N (Plug)**      | AMP / TE Connectivity P/N: D38999/26FB-4PN                    |
+
+---
+
+### 5. CONNECTOR FACE VIEW — CN-LG32 PIN ARRANGEMENT
+
+The following ASCII diagram represents the **mating face view** of the socket
+receptacle CN-LG32 as seen by the technician approaching with the plug
+(i.e., looking into the socket contact face). Orientation reference:
+Key Position A at 12 o'clock. All pin positions are per MIL-DTL-38999 Series III
+Insert Arrangement 4-4.
+
+```
+        CONNECTOR CN-LG32 — SOCKET RECEPTACLE
+        MATING FACE VIEW (Technician Line-of-Sight to Socket)
+        MIL-DTL-38999 Series III — Insert Arrangement 4-4
+        Shell Size 11 — 4 Contacts
+
+                KEY POSITION A
+                     ┆  12 o'clock
+                     ▼
+              ┌──────▲──────┐
+           ╱               ╲
+          │   ┌───┐         │
+          │   │ A │         │  ◄── Pin A  (+28 VDC Power Input)
+          │   └───┘         │         9 o'clock position
+          │                 │
+    9h ──►│  ┌───┐   ┌───┐  │◄── 3h
+          │  │ B │   │ C │  │
+          │  └───┘   └───┘  │  Pin B (9 o'clock) — DC Ground Return
+          │                 │  Pin C (3 o'clock) — Analog Signal Output
+          │   ┌───┐         │
+          │   │ D │         │  ◄── Pin D  (Shield Drain — EMI Ground)
+          │   └───┘         │         6 o'clock position
+           ╲               ╱
+              └─────────────┘
+
+                  6 o'clock
+
+        ┌─────────────────────────────────────────┐
+        │  ORIENTATION LEGEND                     │
+        │  Key Position A : 12 o'clock (north)    │
+        │  Pin A          :  9 o'clock (west)     │
+        │  Pin B          :  9 o'clock lower      │
+        │  Pin C          :  3 o'clock (east)     │
+        │  Pin D          :  6 o'clock (south)    │
+        │                                         │
+        │  View Direction : INTO socket face      │
+        │  (Plug approaching from reader's side)  │
+        └─────────────────────────────────────────┘
+```
+
+> ℹ️ **NOTE:** The key position A anti-rotation feature is a physical bayonet
+> lug on the shell at 12 o'clock. Connector CN-LG32 is keyed to prevent
+> cross-mating with connectors CN-LG30 (Anti-skid control, key position B)
+> and CN-LG33 (Wheel Speed Transducer, key position D) located on the same
+> bracket BKT-32-LG-04. Verify key alignment visually before applying
+> mating torque.
+
+---
+
+### 6. PIN-OUT DISTRIBUTION TABLE — CN-LG32
+
+#### 6.1 Master Pin Assignment Summary
+
+| Pin | Wire Identifier      | AWG  | Core Count | Insulation Color | Functional Role Summary              | Destination                     |
+|-----|----------------------|------|------------|------------------|--------------------------------------|---------------------------------|
+| A   | W-32-MG102-A22       | 22   | 1 (single) | Red              | +28 VDC Power Input                  | CB-10MG, Panel 10VU             |
+| B   | W-32-MG103-B22       | 22   | 1 (single) | Black            | DC Ground Return to GD-02            | Ground Block GD-02, Frame 24    |
+| C   | W-32-MG104-C24       | 24   | 1 (paired) | Blue             | 1.0 V–5.0 V Analog Telemetry Signal  | BSCU-1, Rack 8VU, Input AV-12   |
+| D   | W-32-MG105-D-SH      | 24   | Shield     | Silver (bare)    | Outer Braid EMI Shield — GD-02       | Ground Block GD-02, Frame 24    |
+
+---
+
+#### 6.2 Detailed Pin-by-Pin Specification
+
+---
+
+##### PIN A — +28 VDC POWER INPUT
+
+| Field                        | Value                                                                       |
+|------------------------------|-----------------------------------------------------------------------------|
+| **Pin Identifier**           | Pin A                                                                       |
+| **Wire Identifier**          | W-32-MG102-A22                                                              |
+| **Core Gauge**               | 22 AWG (cross-section: 0.324 mm² nominal per MIL-W-22759/16)               |
+| **Core Count**               | 1 (single conductor, unshielded on this segment)                           |
+| **Insulation Material**      | PTFE (Polytetrafluoroethylene), 0.25 mm wall, per MIL-W-22759/16           |
+| **Insulation Color**         | Red                                                                         |
+| **Voltage Rating**           | 600 VAC / 600 VDC continuous per MIL-W-22759/16                            |
+| **Temperature Rating**       | -65°C to +200°C                                                             |
+| **Functional Role**          | +28 VDC positive excitation supply to Brake Pressure Transducer FIN 12MG Wheatstone bridge Pin 1 (V+) |
+| **Signal Type**              | DC Power — non-switched, continuously energized when CB-10MG is closed     |
+| **Nominal Voltage**          | +28.0 VDC (tolerance: +27.5 VDC to +28.5 VDC under load)                  |
+| **Maximum Current**          | 0.25 A (fused at CB-10MG, 1 A, providing 4:1 over-current margin)          |
+| **Wire Run Origin**          | Circuit Breaker CB-10MG, Contact 1 (output), Panel 10VU, Row E, Position 14, Zone 120 |
+| **Wire Run Destination**     | CN-LG32 Pin A (Zone 710) → Transducer FIN 12MG internal bridge V+ terminal |
+| **Harness Bundle**           | W-32-MG100-SERIES, Sub-bundle W-32-MG102                                   |
+| **Conduit**                  | C-32-LG-01 from Frame 24 to Zone 710 bracket BKT-32-LG-04                 |
+| **Splice Points**            | SP-32-MG102-1 (Zone 310, Frame 44 lower spar, wire gauge maintained 22 AWG throughout) |
+| **Termination — Zone 710**   | Crimp socket contact, size 20, gold-plated, AMP P/N 336430-1 (22–24 AWG crimp range), seated in CN-LG32 insert position A |
+| **Termination — Zone 120**   | Ring lug, M4, tin-plated copper, crimped, terminated at CB-10MG output stud |
+| **Wire Length (approx.)**    | 12.4 m (40.7 ft) Zone 120 to Zone 710 routed length                        |
+| **Resistance (max)**         | 0.58 Ω end-to-end (22 AWG PTFE, 12.4 m at 20°C)                           |
+| **Voltage Drop (max)**       | 0.145 V at 0.25 A maximum load (within +28 VDC ±0.5 V tolerance)          |
+| **Contact Extraction Tool**  | ABS-CON-EXT-38999, size 20 socket removal tip                               |
+| **Contact Insertion Tool**   | AMP P/N 91285-1, size 20 crimp and insertion tool set                      |
+
+---
+
+##### PIN B — DC GROUND RETURN
+
+| Field                        | Value                                                                       |
+|------------------------------|-----------------------------------------------------------------------------|
+| **Pin Identifier**           | Pin B                                                                       |
+| **Wire Identifier**          | W-32-MG103-B22                                                              |
+| **Core Gauge**               | 22 AWG (cross-section: 0.324 mm² nominal per MIL-W-22759/16)               |
+| **Core Count**               | 1 (single conductor; forms twisted shielded pair with Pin C wire W-32-MG104-C24 from CN-LG32 rearward to Frame 24) |
+| **Insulation Material**      | PTFE, 0.25 mm wall, per MIL-W-22759/16                                     |
+| **Insulation Color**         | Black                                                                       |
+| **Voltage Rating**           | 600 VAC / 600 VDC continuous                                                |
+| **Temperature Rating**       | -65°C to +200°C                                                             |
+| **Functional Role**          | DC negative ground return path from Brake Pressure Transducer FIN 12MG bridge Pin 2 (V−) to Ground Block GD-02, Frame 24 |
+| **Signal Type**              | DC Ground Return — low-impedance reference return, not signal-carrying       |
+| **Nominal Voltage**          | 0.0 VDC (ground reference)                                                  |
+| **Maximum Current**          | 0.25 A (matched to Pin A supply)                                            |
+| **Wire Run Origin**          | CN-LG32 Pin B (Zone 710) ← Transducer FIN 12MG internal bridge V− terminal |
+| **Wire Run Destination**     | Ground Block GD-02, Lug Position 7, M4 stud, Frame 24, Zone 120, Fwd Bulkhead Lower Stringer |
+| **Harness Bundle**           | W-32-MG100-SERIES, twisted pair with W-32-MG104-C24 from CN-LG32 rearward  |
+| **Twist Rate**               | 12 ± 2 twists per 300 mm (12 in) per AWM Chapter 20-54 Table 4             |
+| **Shielding**                | Enclosed within outer braid shield W-32-MG105-D-SH from CN-LG32 backshell to GD-02 |
+| **Splice Points**            | None — continuous run, no splices permitted on ground return per AWM Chapter 24-50 |
+| **Termination — Zone 710**   | Crimp socket contact, size 20, gold-plated, AMP P/N 336430-1, seated in CN-LG32 insert position B |
+| **Termination — Zone 120**   | Ring lug, M4, tin-plated copper, crimped to GD-02 Lug 7, torque 18 in-lbs (2.0 N·m) |
+| **Wire Length (approx.)**    | 12.4 m (40.7 ft), matched length to W-32-MG104-C24 within ±50 mm          |
+| **Resistance (max)**         | 0.58 Ω end-to-end at 20°C. Ground block GD-02 to airframe structure: < 2.5 mΩ per AWM Ch. 20-93 |
+| **Isolation — to Pin C**     | Minimum 10 MΩ pin-to-pin isolation at 500 VDC Megger test (signal to ground, connector unmated) |
+| **Contact Extraction Tool**  | ABS-CON-EXT-38999, size 20 socket removal tip                               |
+| **Contact Insertion Tool**   | AMP P/N 91285-1, size 20 crimp and insertion tool set                      |
+
+---
+
+##### PIN C — ANALOG TELEMETRY SIGNAL OUTPUT
+
+| Field                        | Value                                                                       |
+|------------------------------|-----------------------------------------------------------------------------|
+| **Pin Identifier**           | Pin C                                                                       |
+| **Wire Identifier**          | W-32-MG104-C24                                                              |
+| **Core Gauge**               | 24 AWG (cross-section: 0.205 mm² nominal per MIL-W-22759/16)               |
+| **Core Count**               | 1 (single conductor; forms twisted shielded pair with Pin B wire W-32-MG103-B22) |
+| **Insulation Material**      | PTFE, 0.20 mm wall, per MIL-W-22759/16                                     |
+| **Insulation Color**         | Blue                                                                        |
+| **Voltage Rating**           | 600 VAC / 600 VDC continuous                                                |
+| **Temperature Rating**       | -65°C to +200°C                                                             |
+| **Functional Role**          | 1.0 VDC to 5.0 VDC analog pressure telemetry signal output from Brake Pressure Transducer FIN 12MG bridge output Pin 3 (VOUT) to BSCU-1 analog voltage input channel AV-12, Main Avionics Rack 8VU |
+| **Signal Type**              | Analog, single-ended, DC-coupled, ratiometric output proportional to brake line hydraulic pressure |
+| **Signal Range**             | 1.0 VDC = 0 bar (0 PSI) — 5.0 VDC = 350 bar (5,076 PSI)                   |
+| **Signal Linearity**         | ± 0.5% full-scale (transducer specification, FIN 12MG bench test per AMM Task 32-42-05-400-001) |
+| **Out-of-Range Flags**       | < 0.8 VDC = open-circuit / low fault; > 5.2 VDC = short-to-power fault. Either condition sustained > 2.0 sec triggers CMS-FAULT-32-42-E12 at BSCU-1 |
+| **Source Impedance**         | 2.0 kΩ nominal (transducer output bridge resistance, FIN 12MG)              |
+| **Input Impedance at BSCU-1**| 100 kΩ (BSCU-1 analog input AV-12) — provides 50:1 load ratio, < 2% signal attenuation |
+| **Wire Run Origin**          | CN-LG32 Pin C (Zone 710) ← Transducer FIN 12MG internal bridge VOUT terminal |
+| **Wire Run Destination**     | BSCU-1, Main Avionics Rack 8VU, Shelf 3, Position 2, Connector J8VU-32, Pin 12 (Analog Input AV-12) |
+| **Harness Bundle**           | W-32-MG100-SERIES, twisted pair with W-32-MG103-B22; enclosed in shield W-32-MG105-D-SH |
+| **Twist Rate**               | 12 ± 2 twists per 300 mm (12 in) per AWM Chapter 20-54 Table 4             |
+| **Shielding**                | Outer braid W-32-MG105-D-SH — single-point ground at Frame 24 GD-02 only. Zone 710 end floating. |
+| **Splice Points**            | None — continuous run without splices mandatory per signal integrity requirements, AWM Chapter 20-54 Clause 6.3 |
+| **Termination — Zone 710**   | Crimp socket contact, size 20, gold-plated, AMP P/N 336430-1, seated in CN-LG32 insert position C |
+| **Termination — Zone 120**   | Crimp pin contact, size 20, gold-plated, seated in BSCU-1 mating connector J8VU-32 Pin 12 |
+| **Wire Length (approx.)**    | 12.4 m (40.7 ft), matched length to W-32-MG103-B22 within ±50 mm          |
+| **Capacitance (max)**        | 98 pF total (24 AWG PTFE, 12.4 m at 8 pF/m per MIL-W-22759/16) — well below BSCU-1 input bandwidth limit |
+| **Isolation — to Pin A**     | Minimum 10 MΩ at 500 VDC Megger test (signal to +28 V power, connector unmated) |
+| **EMI Sensitivity**          | Susceptible to induced noise above 10 mV peak on this low-level signal. Do not route alongside high-current AC bus feeders. Maintain minimum 50 mm (2 in) physical separation from 115 VAC wiring bundles per AWM Chapter 20-54 Clause 9.1 |
+| **Contact Extraction Tool**  | ABS-CON-EXT-38999, size 20 socket removal tip                               |
+| **Contact Insertion Tool**   | AMP P/N 91285-1, size 20 crimp and insertion tool set                      |
+
+---
+
+##### PIN D — OUTER BRAID EMI SHIELD DRAIN — GROUND TERMINATION
+
+| Field                        | Value                                                                       |
+|------------------------------|-----------------------------------------------------------------------------|
+| **Pin Identifier**           | Pin D                                                                       |
+| **Wire Identifier**          | W-32-MG105-D-SH                                                             |
+| **Core Gauge**               | 24 AWG drain wire (bare tinned copper, extracted from braid at termination point) |
+| **Core Count**               | Shield — outer tinned copper braid, 90% optical coverage minimum            |
+| **Insulation Material**      | None (bare braid); drain wire has clear PTFE sleeve, 20 mm at each termination |
+| **Insulation Color**         | Silver (bare tinned copper braid); drain wire: clear/natural PTFE           |
+| **Voltage Rating**           | Ground reference — 0 VDC nominal; withstands 50 V transient per DO-160G Section 22 |
+| **Temperature Rating**       | -65°C to +200°C                                                             |
+| **Functional Role**          | Outer braid EMI shield drain wire, grounded at Bulkhead Frame 24, Ground Block GD-02 Lug Position 8, to suppress radiated and conducted electromagnetic interference on analog telemetry signal wire W-32-MG104-C24 (Pin C) |
+| **Grounding Architecture**   | Single-point ground — Zone 710 end of shield braid is floating (unterminated, insulated with heat-shrink at CN-LG32 backshell). Frame 24 end only is grounded. Eliminates ground loop on low-level analog signal circuit. |
+| **Shield Coverage**          | Minimum 90% optical braid coverage per MIL-W-22759/16. Verify by inspection prior to harness installation. |
+| **Shield Continuity**        | Braid resistance Pin D to GD-02 Lug 8: < 0.5 Ω measured end-to-end with DMM at 200 mA test current |
+| **Shield Isolation (Zone 710 end)** | Braid float resistance to airframe structure at Zone 710: > 1 MΩ (verified Megger test, 500 VDC, connector mated) |
+| **Wire Run Origin**          | CN-LG32 Pin D (Zone 710, braid drain wire extracted at backshell entry point) |
+| **Wire Run Destination**     | Ground Block GD-02, Lug Position 8, M4 stud, Frame 24, Zone 120            |
+| **Harness Bundle**           | W-32-MG100-SERIES outer sheath — braid is the outermost layer enclosing twisted pair W-32-MG103-B22 / W-32-MG104-C24 |
+| **Splice Points**            | None permitted on shield drain wire per AWM Chapter 20-54 Clause 8.2       |
+| **Termination — Zone 710**   | Braid pigtail drain wire, 50 mm exposed, insulated with clear PTFE heat-shrink. Drain wire crimped to CN-LG32 Pin D socket contact, size 20, AMP P/N 336430-1. Backshell clamped over outer braid jacket entry — do not clamp over braid directly. |
+| **Termination — Zone 120**   | Drain wire, ring lug M4, tin-plated copper, crimped to GD-02 Lug 8, torque 18 in-lbs (2.0 N·m). Install bonding washer between lug and bus bar stud per AWM Chapter 20-93. |
+| **Contact Extraction Tool**  | ABS-CON-EXT-38999, size 20 socket removal tip                               |
+| **Contact Insertion Tool**   | AMP P/N 91285-1, size 20 crimp and insertion tool set                      |
+
+---
+
+### 7. CIRCUIT PROTECTION — CB-10MG
+
+| Field                        | Value                                                                       |
+|------------------------------|-----------------------------------------------------------------------------|
+| **Circuit Breaker Reference**| CB-10MG                                                                     |
+| **Panel Location**           | Panel 10VU, Row E, Position 14, Zone 120 (Main Equipment Centre)            |
+| **Rating**                   | 1 Ampere, 28 VDC, thermal trip                                              |
+| **Protected Circuit**        | W-32-MG102-A22 — Brake Pressure Transducer FIN 12MG excitation supply       |
+| **Trip Class**                | Class 2, slow-blow (sustained overload protection — not fast fault clearing) |
+| **Reset Type**               | Manual push-pull, non-latch. Collar color: Blue (ATA 32 system identification) |
+| **Placard**                  | `BRAKES / PRESS XDCR / LH` (white on black, 6-point font minimum)          |
+| **In-Flight Reset Authority**| Flight Crew — Single reset attempt permitted per FCOM Abnormal Procedure 32-42-01 |
+| **Ground Reset Authority**   | Maintenance personnel — Unlimited resets; investigate fault cause if CB trips repeatedly |
+| **Coordination with BSCU-1** | Loss of CB-10MG results in Pin A supply < 0.8 VDC at transducer, causing Pin C output to drop below 0.8 VDC. BSCU-1 detects low-signal fault and generates CMS-FAULT-32-42-E12 within 2.0 sec. |
+
+---
+
+### 8. WIRING CONTINUITY AND ISOLATION TEST PROCEDURE
+
+> ℹ️ **NOTE:** Perform the following tests with CB-10MG OPEN (pulled), aircraft
+> power OFF, and connectors CN-LG32 and J8VU-32 both unmated. Use calibrated
+> Digital Multimeter T11 (CAT III, 600 V) and Megger tester (500 VDC output)
+> for isolation tests.
+
+| Test | Pin(s) Tested          | Test Method                         | Acceptable Result                     | Reject If                         |
+|------|------------------------|-------------------------------------|---------------------------------------|-----------------------------------|
+| T01  | Pin A — continuity     | DMM resistance, Pin A to CB-10MG output stud | < 0.8 Ω end-to-end          | ≥ 0.8 Ω (open or high resistance)|
+| T02  | Pin B — continuity     | DMM resistance, Pin B to GD-02 Lug 7 | < 0.8 Ω end-to-end                  | ≥ 0.8 Ω                           |
+| T03  | Pin C — continuity     | DMM resistance, Pin C to J8VU-32 Pin 12 | < 1.2 Ω end-to-end             | ≥ 1.2 Ω                           |
+| T04  | Pin D — shield continuity | DMM resistance, Pin D to GD-02 Lug 8 | < 0.5 Ω end-to-end             | ≥ 0.5 Ω                           |
+| T05  | Pin A to Pin B         | Megger 500 VDC, pin-to-pin isolation | ≥ 10 MΩ                              | < 10 MΩ (insulation breakdown)   |
+| T06  | Pin A to Pin C         | Megger 500 VDC, pin-to-pin isolation | ≥ 10 MΩ                              | < 10 MΩ                           |
+| T07  | Pin A to Pin D         | Megger 500 VDC, pin-to-pin isolation | ≥ 10 MΩ                              | < 10 MΩ                           |
+| T08  | Pin B to Pin C         | Megger 500 VDC, pin-to-pin isolation | ≥ 10 MΩ                              | < 10 MΩ                           |
+| T09  | Pin D float (Zone 710) | Megger 500 VDC, Pin D braid to airframe, Zone 710 | ≥ 1 MΩ          | < 1 MΩ (shield grounded at wrong end — ground loop fault) |
+| T10  | GD-02 ground bond      | DMM resistance, GD-02 Lug bus to Frame 24 structure | < 2.5 mΩ       | ≥ 2.5 mΩ (degraded airframe bond)|
+
+---
+
+### 9. FAULT SIGNATURES AND WIRING CROSS-REFERENCE
+
+| Fault Code              | Signal Condition at BSCU-1 AV-12 | Probable Wiring Cause                      | Isolation Starting Point               |
+|-------------------------|----------------------------------|--------------------------------------------|----------------------------------------|
+| `CMS-FAULT-32-42-E12`   | Pin C < 0.8 VDC sustained        | Open circuit — Pin A (no excitation) or Pin C signal wire | Test T01 (Pin A continuity) first     |
+| `CMS-FAULT-32-42-E12`   | Pin C > 5.2 VDC sustained        | Pin C shorted to Pin A (+28 V contamination) | Test T06 (A-to-C isolation)           |
+| `CMS-FAULT-32-42-E13`   | Pin C noisy / oscillating        | Shield drain open — Pin D continuity loss or Zone 710 braid grounded creating ground loop | Test T04 and T09                       |
+| `CMS-FAULT-32-42-E14`   | Pin C fixed at 1.0 VDC (0 bar)  | Pin B ground return open — bridge reference floating | Test T02 (Pin B continuity)           |
+| ECAM `BRAKE L/R SYS FAULT` | Any above condition at BSCU-1 | Refer to `TSM DMC-A320-A-32-42-00-00A-520A-A` | Full fault isolation per TSM Step 3   |
+
+---
+
+### 10. REVISION RECORD
+
+| Rev | Date       | Reason for Change                                                     | Author     |
+|-----|------------|-----------------------------------------------------------------------|------------|
+| A   | 2022-06-01 | Initial issue                                                         | Avionics Eng. |
+| B   | 2023-03-14 | Connector P/N updated to D38999/26WA-4SN; backshell type added        | Avionics Eng. |
+| C   | 2023-11-08 | Fault signatures table added; CB-10MG trip class clarified            | Avionics Eng. |
+| D   | 2024-11-15 | Shield grounding architecture section expanded; Test T09 added        | Avionics Eng. |
+
+---
+
+*End of Data Module — DMC-A320-A-32-42-11-00A-520A-A*
+*AWM/WDM Wiring Architecture and Pin-Out Specification — Revision D — 2024-11-15*
+```
