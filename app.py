@@ -1,8 +1,8 @@
 import os
 import re
 import textwrap
-import time
 from pathlib import Path
+from typing import Optional
 
 import streamlit as st
 from google import genai
@@ -11,10 +11,33 @@ from google import genai
 APP_TITLE = "AI-Augmented Technical Manuals"
 DOC_DIR = Path(__file__).parent / "manuals"
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-EMBEDDING_MODEL = os.getenv("GEMINI_EMBEDDING_MODEL", "gemini-embedding-001")
 CHUNK_SIZE = 1400
 CHUNK_OVERLAP = 180
 TOP_K = 6
+STOP_WORDS = {
+    "what",
+    "which",
+    "with",
+    "from",
+    "that",
+    "this",
+    "should",
+    "required",
+    "give",
+    "tell",
+    "show",
+    "and",
+    "the",
+    "for",
+    "are",
+    "is",
+    "in",
+    "on",
+    "to",
+    "of",
+    "a",
+    "an",
+}
 
 DOC_FAMILY_BY_FILE = {
     "amm_brake_actuator_maintenance.md.txt": "AMM",
@@ -163,54 +186,75 @@ def build_chunks() -> list[dict]:
     return chunks
 
 
-def embedding_values(embedding_obj):
-    if hasattr(embedding_obj, "values"):
-        return list(embedding_obj.values)
-    if isinstance(embedding_obj, dict):
-        return embedding_obj.get("values", [])
-    return list(embedding_obj)
+def tokenize(text: str) -> list[str]:
+    tokens = re.findall(r"[a-z0-9][a-z0-9-]{1,}", text.lower())
+    return [token for token in tokens if token not in STOP_WORDS]
 
 
-def embed_texts(client, texts: list[str]) -> list[list[float]]:
-    all_vectors = []
-    batch_size = 20
-    for start in range(0, len(texts), batch_size):
-        batch = texts[start : start + batch_size]
-        response = client.models.embed_content(model=EMBEDDING_MODEL, contents=batch)
-        all_vectors.extend([embedding_values(item) for item in response.embeddings])
-        time.sleep(0.1)
-    return all_vectors
+def prepare_search_text(text: str, metadata: dict) -> str:
+    return " ".join(
+        [
+            text,
+            metadata.get("source", ""),
+            metadata.get("DMC", ""),
+            metadata.get("FIN", ""),
+            metadata.get("EFF", ""),
+            metadata.get("row_eff", ""),
+            metadata.get("fault_code", ""),
+            metadata.get("connector", ""),
+        ]
+    ).lower()
 
 
-def cosine_similarity(left: list[float], right: list[float]) -> float:
-    numerator = sum(a * b for a, b in zip(left, right))
-    left_norm = sum(a * a for a in left) ** 0.5
-    right_norm = sum(b * b for b in right) ** 0.5
-    if not left_norm or not right_norm:
-        return 0.0
-    return numerator / (left_norm * right_norm)
+def exact_phrase_score(question: str, search_text: str) -> float:
+    score = 0.0
+    quoted_terms = re.findall(r"`([^`]+)`|\\b([A-Z]{2,}-[A-Z0-9-]+|[A-Z0-9]+-[A-Z0-9-]+)\\b", question)
+    for groups in quoted_terms:
+        term = next((group for group in groups if group), "")
+        if term and term.lower() in search_text:
+            score += 3.0
+    return score
 
 
-def keyword_boost(question: str, text: str, metadata: dict) -> float:
-    haystack = f"{text} {metadata.get('source', '')} {metadata.get('DMC', '')}".lower()
-    tokens = set(re.findall(r"[a-z0-9][a-z0-9-]{2,}", question.lower()))
+def lexical_score(question: str, item: dict) -> float:
+    search_text = item["search_text"]
+    tokens = tokenize(question)
     if not tokens:
         return 0.0
-    hits = sum(1 for token in tokens if token in haystack)
-    return min(hits / max(len(tokens), 1), 1.0) * 0.12
+
+    score = exact_phrase_score(question, search_text)
+    for token in tokens:
+        count = search_text.count(token)
+        if not count:
+            continue
+        if any(char.isdigit() for char in token) or "-" in token:
+            score += min(count, 4) * 1.25
+        else:
+            score += min(count, 4) * 0.55
+
+    compact_question = " ".join(tokens)
+    for phrase_len in (4, 3, 2):
+        words = compact_question.split()
+        for start in range(0, max(len(words) - phrase_len + 1, 0)):
+            phrase = " ".join(words[start : start + phrase_len])
+            if phrase and phrase in search_text:
+                score += phrase_len * 0.75
+    return score
 
 
 def reset_index():
     st.session_state.pop("knowledge_index", None)
 
 
-def build_index(api_key: str) -> int:
-    client = make_client(api_key)
+def build_index(api_key: Optional[str] = None) -> int:
     chunks = build_chunks()
-    vectors = embed_texts(client, [c["text"] for c in chunks])
     st.session_state["knowledge_index"] = [
-        {"text": chunk["text"], "metadata": chunk["metadata"], "embedding": vector}
-        for chunk, vector in zip(chunks, vectors)
+        {
+            "text": chunk["text"],
+            "metadata": chunk["metadata"],
+            "search_text": prepare_search_text(chunk["text"], chunk["metadata"]),
+        }
+        for chunk in chunks
     ]
     return len(chunks)
 
@@ -220,14 +264,11 @@ def collection_ready() -> bool:
 
 
 def retrieve(api_key: str, question: str, families: list[str], top_k: int = TOP_K) -> list[dict]:
-    client = make_client(api_key)
-    query_vector = embed_texts(client, [question])[0]
     rows = []
     for item in st.session_state.get("knowledge_index", []):
         if families and item["metadata"].get("source") not in families:
             continue
-        semantic_score = cosine_similarity(query_vector, item["embedding"])
-        score = semantic_score + keyword_boost(question, item["text"], item["metadata"])
+        score = lexical_score(question, item)
         rows.append({"text": item["text"], "metadata": item["metadata"], "score": score})
     return sorted(rows, key=lambda row: row["score"], reverse=True)[:top_k]
 
@@ -324,7 +365,7 @@ Technical publication access layer
   - Effectivity: MSN range
         |
         v
-Semantic retrieval and effectivity filtering
+Local retrieval and effectivity filtering
         |
         v
 Relevant controlled-publication excerpts
@@ -344,7 +385,7 @@ The visible experience abstracts away the underlying source count and presents t
 
 Recommended production upgrades:
 - Replace local markdown files with an approved technical-publication connector.
-- Persist embeddings to controlled storage and version indexes by manual revision.
+- Persist retrieval indexes to controlled storage and version them by manual revision.
 - Add authentication, audit logs, and feedback capture.
 - Keep human-in-the-loop approval for any maintenance release decision.
         """
@@ -374,7 +415,7 @@ api_key_default = get_secret("GEMINI_API_KEY") or get_secret("GOOGLE_API_KEY")
 with st.sidebar:
     st.header("Runtime")
     api_key = st.text_input("Gemini API key", value=api_key_default, type="password")
-    st.caption("Use Colab Secrets or environment variable GEMINI_API_KEY for cleaner runs.")
+    st.caption("Gemini is used only for answer generation. Retrieval runs locally for demo stability.")
     reset = st.button("Reset knowledge layer")
     if reset:
         reset_index()
@@ -386,16 +427,16 @@ tab_ask, tab_arch = st.tabs(["Ask Manuals", "Architecture"])
 
 with tab_ask:
     if not api_key:
-        st.warning("Enter a Gemini API key in the sidebar before building the index or asking questions.")
+        st.warning("Enter a Gemini API key in the sidebar before asking questions.")
 
     c1, c2 = st.columns([1, 1])
     with c1:
-        if st.button("Initialize knowledge layer", type="primary", disabled=not api_key):
+        if st.button("Initialize knowledge layer", type="primary"):
             with st.spinner("Preparing the technical-publication knowledge layer..."):
-                count = build_index(api_key)
+                build_index()
             st.success("Knowledge layer is ready.")
     with c2:
-        st.caption("First run prepares the local demonstration knowledge layer. Later runs reuse it.")
+        st.caption("First run prepares the local demonstration knowledge layer. Retrieval runs locally for stable demos.")
 
     examples = [
         "What torque is required for the structural retention bolts, and what sequence should I follow?",
@@ -410,7 +451,7 @@ with tab_ask:
     if st.button("Ask Gemini", disabled=not api_key or not config["families"]):
         if not collection_ready():
             with st.spinner("Preparing the knowledge layer..."):
-                build_index(api_key)
+                build_index()
         with st.spinner("Retrieving approved technical context..."):
             retrieved = retrieve(api_key, question, config["families"], top_k=top_k)
         with st.spinner("Generating grounded answer with Gemini..."):
